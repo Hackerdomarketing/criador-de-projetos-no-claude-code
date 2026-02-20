@@ -229,6 +229,74 @@ else
 fi
 
 echo ""
+
+# ─────────────────────────────────────────────────────
+# GIT E GITHUB — Versionar o CRIADOR-DE-PROJETOS
+# Cria um repositório privado no GitHub do usuário
+# com o próprio sistema instalado — como backup.
+# ─────────────────────────────────────────────────────
+
+PASTA_CRIADOR="$PASTA_BASE/CRIADOR-DE-PROJETOS"
+
+echo "  Criando repositório do sistema no seu GitHub..."
+echo ""
+
+cd "$PASTA_CRIADOR" || exit 1
+
+# Criar .gitignore para o CRIADOR-DE-PROJETOS
+cat > .gitignore << 'GITIGNORE'
+.DS_Store
+*.log
+/.memoria-*.md
+!templates/.memoria-*.md
+GITIGNORE
+
+# Inicializar git se ainda não for um repositório
+if [ ! -d ".git" ]; then
+    git init -b main 2>/dev/null || git init && git checkout -b main 2>/dev/null || true
+fi
+
+# Verificar se o remote já existe (atualização)
+if git remote get-url origin &>/dev/null; then
+    echo "  ↻ Repositório já existe — enviando atualização..."
+    git add -A
+    git commit -m "chore: atualização do sistema criador de projetos" 2>/dev/null || true
+    git push origin main
+    LINK_REPO=$(gh repo view --json url -q '.url' 2>/dev/null || echo "")
+    echo "  ✓ Repositório atualizado: $LINK_REPO"
+else
+    # Verificar se o repositório já existe no GitHub
+    USUARIO_GH=$(gh api user --jq '.login' 2>/dev/null || echo "")
+    REPO_JA_EXISTE=$(gh repo view "$USUARIO_GH/criador-de-projetos" --json name -q '.name' 2>/dev/null || echo "")
+
+    git add -A
+    git commit -m "feat: instalação do sistema criador de projetos"
+
+    if [ -n "$REPO_JA_EXISTE" ]; then
+        # Repositório existe mas sem remote configurado
+        git remote add origin "https://github.com/$USUARIO_GH/criador-de-projetos.git"
+        git push -u origin main
+        LINK_REPO="https://github.com/$USUARIO_GH/criador-de-projetos"
+    else
+        # Criar novo repositório privado
+        gh repo create criador-de-projetos \
+            --private \
+            --source=. \
+            --push \
+            --description "Meu sistema de criação de projetos com Claude Code" \
+            2>/dev/null || true
+        LINK_REPO=$(gh repo view "$USUARIO_GH/criador-de-projetos" --json url -q '.url' 2>/dev/null || echo "")
+    fi
+
+    if [ -n "$LINK_REPO" ]; then
+        echo "  ✓ Repositório criado (privado): $LINK_REPO"
+    else
+        echo "  ⚠️  Não foi possível criar o repositório no GitHub."
+        echo "    Os arquivos estão instalados localmente normalmente."
+    fi
+fi
+
+echo ""
 echo "═══════════════════════════════════════════════════"
 echo "  Instalação concluída!"
 echo ""
@@ -236,6 +304,9 @@ echo "  O que foi instalado:"
 echo "  ✓ Node.js (necessário para o Claude Code)"
 echo "  ✓ GitHub CLI (cria repositórios automaticamente)"
 echo "  ✓ Sistema Criador de Projetos em $PASTA_BASE/"
+if [ -n "$LINK_REPO" ]; then
+echo "  ✓ Backup do sistema no GitHub: $LINK_REPO"
+fi
 echo ""
 echo "  Próximo passo:"
 echo "  Abra o terminal em $PASTA_BASE/"
