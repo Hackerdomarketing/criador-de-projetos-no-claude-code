@@ -16,54 +16,15 @@ Depois de instalar, você abre o Claude Code no terminal, diz algo como *"criar 
 
 ---
 
-## O que você precisa ter antes de instalar
+## Instalação
 
-Apenas uma coisa: o **Claude Code funcionando no terminal** — ou seja, você consegue abrir o terminal, digitar `claude` e conversar com o Claude.
+Abra o **Claude Code** e cole este prompt:
 
-Se ainda não tem, instale em: https://github.com/anthropics/claude-code
+> **"Por favor, instala este sistema pra mim: https://github.com/Hackerdomarketing/criador-de-projetos-no-claude-code — Clona o repositório, entra na pasta e roda o arquivo instalar.sh. Ele vai verificar e instalar tudo que estiver faltando automaticamente."**
 
-Tudo o mais que o sistema precisa — Node.js, GitHub CLI, autenticação no GitHub — o instalador verifica e instala automaticamente. Você não precisa fazer nada disso na mão.
+Pronto. O Claude vai baixar os arquivos e instalar tudo automaticamente — Node.js, GitHub CLI, autenticação no GitHub. Se precisar de alguma confirmação ou senha durante o processo, ele vai pedir na hora.
 
----
-
-## Instalando o sistema
-
-### No Mac
-
-Abra o **Terminal** — pressione **Command + Espaço**, escreva **Terminal** e pressione Enter. Uma janela escura vai abrir. É aqui onde você vai digitar os comandos.
-
-Cole estes três comandos, um por vez, pressionando Enter após cada um:
-
-**Passo 1 — Baixar os arquivos:**
-```
-cd ~/Downloads && git clone https://github.com/Hackerdomarketing/criador-de-projetos-no-claude-code.git
-```
-
-**Passo 2 — Entrar na pasta baixada:**
-```
-cd ~/Downloads/criador-de-projetos-no-claude-code
-```
-
-**Passo 3 — Rodar o instalador:**
-```
-bash instalar.sh
-```
-
-O instalador vai verificar automaticamente tudo que está instalado no seu computador e vai instalar o que estiver faltando. Se precisar de alguma autorização — senha do computador, confirmação de instalação — ele vai pedir na hora e explicar o que está fazendo.
-
-O instalador também vai perguntar em qual pasta você quer guardar seus projetos. Se não tiver preferência, pressione Enter para usar o padrão (`~/projetos/`).
-
-### No Windows
-
-No Windows, você precisa de um programa chamado **Git for Windows** antes de rodar o instalador. Ele instala o Git (necessário para criar repositórios) e um terminal chamado **Git Bash**, que é onde você vai digitar os comandos.
-
-**Para instalar o Git for Windows:**
-1. Acesse: https://git-scm.com/download/win
-2. O download começa automaticamente — abra o arquivo que baixar
-3. Clique **Next** em todas as telas (as opções padrão estão corretas) e depois **Install**
-4. Após instalar, pesquise **Git Bash** no menu Iniciar e abra
-
-Com o Git Bash aberto, cole os mesmos três passos acima — eles funcionam igual ao Mac. O instalador vai verificar automaticamente se Node.js e GitHub CLI estão instalados no seu computador. Se não estiverem, ele vai mostrar exatamente o que você precisa fazer antes de continuar.
+**Se você usa Windows:** antes desse passo, instale o **Git for Windows** em https://git-scm.com/download/win — clique em Next em todas as telas. O Git é necessário para baixar os arquivos do repositório. Depois é só abrir o Claude Code e colar o prompt acima normalmente.
 
 ---
 
@@ -80,7 +41,7 @@ cd ~/projetos
 claude
 ```
 
-O Claude precisa estar na pasta certa para encontrar as instruções que você instalou. Se você abrir o Claude de outra pasta, ele não vai encontrar o arquivo `CLAUDE.md` com as instruções do sistema.
+O Claude precisa estar na pasta certa para encontrar as instruções que você instalou.
 
 ### O que dizer para criar um projeto
 
@@ -118,11 +79,11 @@ Toda vez que você pede um projeto novo, o Claude cria estes arquivos dentro de 
 
 **Por que preciso abrir o terminal na pasta certa?**
 
-O Claude Code lê as instruções de um arquivo chamado `CLAUDE.md` que fica na pasta onde você o abre. Esse arquivo contém todas as regras do sistema de criação de projetos. Se você abrir o Claude em outra pasta, ele não vai encontrar esse arquivo e não vai saber como criar projetos automaticamente.
+O Claude Code lê as instruções de um arquivo chamado `CLAUDE.md` que fica na pasta onde você o abre. Esse arquivo contém todas as regras do sistema de criação de projetos. Se você abrir o Claude em outra pasta, ele não vai encontrar esse arquivo.
 
 **E se eu já tiver um arquivo CLAUDE.md na minha pasta de projetos?**
 
-O instalador não apaga nem modifica o que você já tem. Ele só cria um CLAUDE.md novo se não existir nenhum. Se você já tem um, o instalador vai avisar e não vai mexer nele. Se quiser adicionar as instruções do sistema ao seu CLAUDE.md existente, copie o conteúdo do arquivo `CRIADOR-DE-PROJETOS/templates/CLAUDE.md` e cole no seu.
+O instalador não apaga nem modifica o que você já tem. Ele só cria um CLAUDE.md novo se não existir nenhum. Se você já tem um, o instalador vai avisar e não vai mexer nele.
 
 **O repositório que o Claude cria no GitHub é privado ou público?**
 
@@ -138,4 +99,4 @@ Sim. Basta deletar a pasta `CRIADOR-DE-PROJETOS/` e o arquivo `CLAUDE.md` de den
 
 **O que é o Git que o Claude configura em cada projeto?**
 
-O Git é um sistema que registra cada mudança feita nos arquivos do projeto — como um histórico completo. Se você apagar algo por acidente, ou quiser voltar para uma versão anterior, o Git permite isso. O GitHub é o lugar online onde esse histórico fica guardado. Quando o Claude cria um projeto, ele configura o Git automaticamente.
+O Git é um sistema que registra cada mudança feita nos arquivos do projeto — como um histórico completo. Se você apagar algo por acidente, ou quiser voltar para uma versão anterior, o Git permite isso. Quando o Claude cria um projeto, ele configura o Git automaticamente.
