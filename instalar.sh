@@ -16,44 +16,80 @@ echo ""
 HOUVE_ERRO=0
 
 # ─────────────────────────────────────────────────────
-# VERIFICAÇÃO 1 — Homebrew
+# DETECÇÃO DO SISTEMA OPERACIONAL
+# ─────────────────────────────────────────────────────
+
+case "$(uname -s 2>/dev/null)" in
+    Darwin*)                OS="mac" ;;
+    MINGW*|MSYS*|CYGWIN*)   OS="windows" ;;
+    Linux*)                 OS="linux" ;;
+    *)                      OS="outros" ;;
+esac
+
+if [ "$OS" = "windows" ]; then
+    echo "  Sistema detectado: Windows (Git Bash)"
+    echo ""
+    echo "  No Windows, a instalação automática de ferramentas"
+    echo "  não está disponível. Se Node.js ou GitHub CLI não"
+    echo "  estiverem instalados, você vai receber instruções"
+    echo "  de como instalá-los manualmente."
+elif [ "$OS" = "mac" ]; then
+    echo "  Sistema detectado: macOS"
+else
+    echo "  Sistema detectado: $OS"
+fi
+echo ""
+
+# Função para sed compatível com Mac e Windows/Linux
+sed_inplace() {
+    if [ "$OS" = "mac" ]; then
+        sed -i '' "$1" "$2" 2>/dev/null || true
+    else
+        sed -i "$1" "$2" 2>/dev/null || true
+    fi
+}
+
+# ─────────────────────────────────────────────────────
+# VERIFICAÇÃO 1 — Homebrew (apenas no Mac)
 # O Homebrew é um instalador de programas para Mac.
 # Precisamos dele para instalar o Node.js e o GitHub CLI.
 # ─────────────────────────────────────────────────────
 
-echo "  Verificando Homebrew (instalador de programas para Mac)..."
-
-if ! command -v brew &>/dev/null; then
-    echo ""
-    echo "  O Homebrew não está instalado."
-    echo "  Ele é necessário para instalar o Node.js e o GitHub CLI."
-    echo "  Instalando agora..."
-    echo ""
-    echo "  Pode aparecer uma janela pedindo a senha do seu computador."
-    echo "  Isso é normal — é para ter permissão de instalar programas."
-    echo ""
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    # No Apple Silicon (M1/M2/M3), o Homebrew fica em /opt/homebrew
-    if [ -f "/opt/homebrew/bin/brew" ]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-    fi
+if [ "$OS" = "mac" ]; then
+    echo "  Verificando Homebrew (instalador de programas para Mac)..."
 
     if ! command -v brew &>/dev/null; then
         echo ""
-        echo "  ✗ Não foi possível instalar o Homebrew automaticamente."
-        echo "    Acesse https://brew.sh e siga as instruções de instalação manual."
-        echo "    Depois de instalar, rode este script novamente."
-        exit 1
+        echo "  O Homebrew não está instalado."
+        echo "  Ele é necessário para instalar o Node.js e o GitHub CLI."
+        echo "  Instalando agora..."
+        echo ""
+        echo "  Pode aparecer uma janela pedindo a senha do seu computador."
+        echo "  Isso é normal — é para ter permissão de instalar programas."
+        echo ""
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+        # No Apple Silicon (M1/M2/M3), o Homebrew fica em /opt/homebrew
+        if [ -f "/opt/homebrew/bin/brew" ]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        fi
+
+        if ! command -v brew &>/dev/null; then
+            echo ""
+            echo "  ✗ Não foi possível instalar o Homebrew automaticamente."
+            echo "    Acesse https://brew.sh e siga as instruções de instalação manual."
+            echo "    Depois de instalar, rode este script novamente."
+            exit 1
+        fi
+
+        echo ""
+        echo "  ✓ Homebrew instalado com sucesso."
+    else
+        echo "  ✓ Homebrew já está instalado."
     fi
 
     echo ""
-    echo "  ✓ Homebrew instalado com sucesso."
-else
-    echo "  ✓ Homebrew já está instalado."
 fi
-
-echo ""
 
 # ─────────────────────────────────────────────────────
 # VERIFICAÇÃO 2 — Node.js
@@ -64,17 +100,25 @@ echo "  Verificando Node.js (necessário para o Claude Code funcionar)..."
 
 if ! command -v node &>/dev/null; then
     echo ""
-    echo "  O Node.js não está instalado. Instalando agora..."
-    brew install node
+    if [ "$OS" = "mac" ]; then
+        echo "  O Node.js não está instalado. Instalando agora..."
+        brew install node
 
-    if ! command -v node &>/dev/null; then
-        echo ""
-        echo "  ✗ Não foi possível instalar o Node.js automaticamente."
-        echo "    Baixe em: https://nodejs.org (clique no botão LTS)"
-        echo "    Instale normalmente e rode este script novamente."
-        HOUVE_ERRO=1
+        if ! command -v node &>/dev/null; then
+            echo ""
+            echo "  ✗ Não foi possível instalar o Node.js automaticamente."
+            echo "    Baixe em: https://nodejs.org (clique no botão LTS)"
+            echo "    Instale normalmente e rode este script novamente."
+            HOUVE_ERRO=1
+        else
+            echo "  ✓ Node.js instalado: $(node --version)"
+        fi
     else
-        echo "  ✓ Node.js instalado: $(node --version)"
+        echo "  ✗ Node.js não encontrado."
+        echo "    Acesse https://nodejs.org e clique no botão LTS para baixar."
+        echo "    Instale normalmente (Next → Next → Install)."
+        echo "    Depois feche e abra o Git Bash novamente e rode este script de novo."
+        HOUVE_ERRO=1
     fi
 else
     echo "  ✓ Node.js já está instalado: $(node --version)"
@@ -91,16 +135,29 @@ echo "  Verificando GitHub CLI (cria repositórios no GitHub automaticamente)...
 
 if ! command -v gh &>/dev/null; then
     echo ""
-    echo "  O GitHub CLI não está instalado. Instalando agora..."
-    brew install gh
+    if [ "$OS" = "mac" ]; then
+        echo "  O GitHub CLI não está instalado. Instalando agora..."
+        brew install gh
 
-    if ! command -v gh &>/dev/null; then
-        echo ""
-        echo "  ✗ Não foi possível instalar o GitHub CLI automaticamente."
-        echo "    Tente manualmente: brew install gh"
-        HOUVE_ERRO=1
+        if ! command -v gh &>/dev/null; then
+            echo ""
+            echo "  ✗ Não foi possível instalar o GitHub CLI automaticamente."
+            echo "    Tente manualmente: brew install gh"
+            HOUVE_ERRO=1
+        else
+            echo "  ✓ GitHub CLI instalado: $(gh --version | head -1)"
+        fi
     else
-        echo "  ✓ GitHub CLI instalado: $(gh --version | head -1)"
+        echo "  ✗ GitHub CLI não encontrado."
+        echo ""
+        echo "  Para instalar no Windows, abra o PowerShell como administrador"
+        echo "  (clique com botão direito → Executar como administrador) e cole:"
+        echo "    winget install --id GitHub.cli"
+        echo ""
+        echo "  Ou baixe diretamente em: https://cli.github.com"
+        echo ""
+        echo "  Após instalar, feche e abra o Git Bash novamente e rode este script de novo."
+        HOUVE_ERRO=1
     fi
 else
     echo "  ✓ GitHub CLI já está instalado: $(gh --version | head -1)"
@@ -211,8 +268,8 @@ cp templates/CLAUDE.md                    "$PASTA_BASE/CRIADOR-DE-PROJETOS/templ
 cp templates/.memoria-ultimas-tarefas.md  "$PASTA_BASE/CRIADOR-DE-PROJETOS/templates/"
 cp templates/.memoria-do-dia.md           "$PASTA_BASE/CRIADOR-DE-PROJETOS/templates/"
 
-sed -i '' "s|~/projetos/|$PASTA_BASE/|g" "$PASTA_BASE/CRIADOR-DE-PROJETOS/AGENTE.md"         2>/dev/null || true
-sed -i '' "s|~/projetos/|$PASTA_BASE/|g" "$PASTA_BASE/CRIADOR-DE-PROJETOS/REGRA-ATIVACAO.md" 2>/dev/null || true
+sed_inplace "s|~/projetos/|$PASTA_BASE/|g" "$PASTA_BASE/CRIADOR-DE-PROJETOS/AGENTE.md"
+sed_inplace "s|~/projetos/|$PASTA_BASE/|g" "$PASTA_BASE/CRIADOR-DE-PROJETOS/REGRA-ATIVACAO.md"
 
 echo "  ✓ Sistema instalado em $PASTA_BASE/CRIADOR-DE-PROJETOS/"
 echo ""
@@ -220,7 +277,7 @@ echo ""
 if [ ! -f "$PASTA_BASE/CLAUDE.md" ]; then
     cp templates/CLAUDE.md "$PASTA_BASE/CLAUDE.md"
     DATE=$(date +%Y-%m-%d)
-    sed -i '' "s/\[DATA-ATUAL\]/$DATE/g" "$PASTA_BASE/CLAUDE.md"
+    sed_inplace "s/\[DATA-ATUAL\]/$DATE/g" "$PASTA_BASE/CLAUDE.md"
     echo "  ✓ CLAUDE.md criado em $PASTA_BASE/CLAUDE.md"
 else
     echo "  ✓ CLAUDE.md já existe — não foi alterado."

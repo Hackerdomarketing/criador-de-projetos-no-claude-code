@@ -10,6 +10,8 @@ Imagine que você quer contratar um assistente para organizar seus projetos de p
 
 Depois de instalar, você abre o Claude Code no terminal, diz algo como *"criar um projeto de lista de tarefas"*, e o Claude organiza tudo automaticamente. Você não precisa criar pasta, não precisa configurar nada, não precisa lembrar de fazer backup. Ele faz por você.
 
+> **Você usa Mac ou Windows?** Este guia tem instruções para as duas plataformas. A maior parte está escrita para Mac. Se você usa Windows, existe uma seção completa chamada **"Se você usa Windows"** mais abaixo — você pode pular direto para ela.
+
 > **Este repositório é para quem usa o Claude Code no Terminal** (digitando `claude` numa janela de terminal).
 > Se você usa o **VS Code com a extensão Claude Code**, use este outro repositório, que é específico para esse caso:
 > https://github.com/Hackerdomarketing/criador-de-projetos-claude-code-no-vscode
@@ -237,6 +239,173 @@ Toda vez que você pede um projeto novo, o Claude cria estes arquivos dentro de 
 | `.memoria-projeto.md` | A memória completa do projeto: decisões tomadas, arquitetura, histórico. O Claude lê isso quando precisa de contexto mais profundo. |
 | `README.md` | Um documento explicando o que o projeto faz e como usar. |
 | `.gitignore` | Uma lista de arquivos que não devem ir para o GitHub (senhas, arquivos temporários, etc.). |
+
+---
+
+## Se você usa Windows
+
+Esta seção cobre tudo que você precisa para instalar o sistema em um computador com Windows. O processo é praticamente o mesmo que no Mac — só muda como você instala as ferramentas no começo.
+
+---
+
+### Passo W1 — Instalar o Git for Windows
+
+No Windows, não existe o "Terminal" do Mac. Para rodar este sistema, você vai usar um programa chamado **Git Bash** — que é instalado junto com o **Git for Windows**.
+
+O Git é o sistema que salva o histórico dos seus projetos (sem ele, o Claude não consegue criar repositórios no GitHub). O Git Bash é o terminal onde você vai digitar os comandos deste guia.
+
+**Para instalar o Git for Windows:**
+
+1. Acesse: https://git-scm.com/download/win
+2. O download vai começar automaticamente. Se não começar, clique no link que aparece na página.
+3. Abra o arquivo que foi baixado — vai ter um nome parecido com `Git-2.47.0-64-bit.exe`
+4. Clique **Next** em todas as telas — as opções padrão funcionam perfeitamente, você não precisa mudar nada
+5. Clique **Install** e aguarde terminar
+6. Clique **Finish**
+
+**Como abrir o Git Bash depois de instalar:**
+
+- Clique no botão Iniciar (o logo do Windows no canto inferior esquerdo da tela)
+- Na barra de pesquisa, escreva: **Git Bash**
+- Clique no programa que aparecer
+
+Uma janela preta vai abrir — esse é o seu terminal no Windows. É aqui onde você vai digitar os comandos.
+
+---
+
+### Passo W2 — Instalar o Node.js
+
+O **Node.js** é um programa que o Claude Code precisa para funcionar nos bastidores. Você não vai usar ele diretamente — ele só precisa estar instalado.
+
+**Para verificar se você já tem:**
+
+Abra o **Git Bash** e digite exatamente isso, depois pressione Enter:
+
+```
+node --version
+```
+
+Se aparecer algo como `v20.11.0` ou qualquer número, você já tem. Pode pular para o Passo W3.
+
+**Se não aparecer (ou aparecer uma mensagem de erro), instale assim:**
+
+1. Acesse: https://nodejs.org
+2. Clique no botão grande que diz **LTS** — esse é a versão estável e recomendada para a maioria das pessoas
+3. Vai baixar um arquivo `.msi` — abra-o e clique Next → Next → Install
+4. Feche o Git Bash e abra de novo
+5. Digite `node --version` para confirmar que a instalação funcionou
+
+---
+
+### Passo W3 — Instalar o GitHub CLI
+
+O **GitHub CLI** é uma ferramenta que permite criar repositórios no GitHub diretamente do terminal, sem precisar usar o site.
+
+**Para verificar se você já tem:**
+
+No Git Bash, digite:
+
+```
+gh --version
+```
+
+Se aparecer algo como `gh version 2.40.0`, você já tem. Pode ir para o Passo W4.
+
+**Se não aparecer, instale de uma destas duas formas:**
+
+**Forma A — Via PowerShell (mais rápida):**
+
+1. Clique no botão Iniciar e pesquise por **PowerShell**
+2. Clique com o botão direito no resultado e escolha **Executar como administrador**
+3. Cole este comando e pressione Enter:
+
+```
+winget install --id GitHub.cli
+```
+
+4. Aguarde a instalação terminar — vão aparecer algumas linhas de texto passando
+5. Feche o PowerShell e abra o Git Bash novamente
+6. Digite `gh --version` para confirmar
+
+**Forma B — Download direto (se o winget não funcionar):**
+
+1. Acesse: https://cli.github.com
+2. Clique em **Download for Windows**
+3. Baixe e instale normalmente — Next → Install
+
+---
+
+### Passo W4 — Conectar o GitHub CLI à sua conta do GitHub
+
+Isso só precisa ser feito uma vez. Serve para que a ferramenta saiba qual conta do GitHub é a sua.
+
+No Git Bash, digite:
+
+```
+gh auth login
+```
+
+Vai aparecer um menu de opções no terminal. Use as setas do teclado para navegar e Enter para confirmar. Escolha:
+
+- **GitHub.com** (não a opção Enterprise)
+- **HTTPS**
+- **Login with a web browser** (autenticar pelo navegador)
+
+O terminal vai mostrar um código de 8 letras e vai abrir o GitHub no seu navegador. Cole o código lá, faça login na sua conta do GitHub, e pronto. Você vai ver uma mensagem de confirmação no terminal.
+
+Se ainda não tem conta no GitHub, crie uma grátis em https://github.com antes de fazer este passo.
+
+---
+
+### Passo W5 — Baixar e instalar o sistema
+
+Com tudo instalado, abra o **Git Bash** e cole estes três comandos, um por vez:
+
+**Baixar os arquivos do sistema:**
+
+```
+cd ~/Downloads && git clone https://github.com/Hackerdomarketing/criador-de-projetos-no-claude-code.git
+```
+
+Vão aparecer algumas linhas de texto — é o download acontecendo. Aguarde terminar.
+
+**Entrar na pasta baixada:**
+
+```
+cd ~/Downloads/criador-de-projetos-no-claude-code
+```
+
+**Rodar o instalador:**
+
+```
+bash instalar.sh
+```
+
+O instalador vai perguntar em qual pasta você quer guardar seus projetos. Se não tiver preferência, pressione Enter para usar o padrão (`~/projetos/`), que no Windows equivale a `C:\Users\seu-nome\projetos\`.
+
+---
+
+### Usando o sistema no Windows depois de instalar
+
+1. Abra o **Git Bash** na pasta onde seus projetos ficam (a que você escolheu na instalação)
+2. Digite `claude` e pressione Enter
+3. Quando o Claude Code abrir, escreva o que você quer criar — por exemplo: *"criar um projeto de lista de tarefas"*
+
+O Claude vai perguntar algumas coisas para entender o que você quer e depois vai criar tudo automaticamente. O processo é idêntico ao Mac.
+
+---
+
+### Diferenças entre Mac e Windows
+
+| Situação | No Mac | No Windows |
+|----------|--------|------------|
+| Abrir o terminal | Pesquise "Terminal" (Command+Espaço) | Pesquise "Git Bash" no menu Iniciar |
+| Instalar programas pelo terminal | `brew install nome` | `winget install nome` (no PowerShell) |
+| Pasta padrão dos projetos | `~/projetos/` | `C:\Users\seu-nome\projetos\` |
+| Separador de pasta nos caminhos | `/` (barra normal) | `\` (barra invertida), mas no Git Bash funciona com `/` |
+| Rodar o Claude Code | `claude` no Terminal | `claude` no Git Bash |
+
+No dia a dia — pedir ao Claude para criar projetos, trabalhar no código, conversar normalmente — não há nenhuma diferença entre Mac e Windows.
 
 ---
 
