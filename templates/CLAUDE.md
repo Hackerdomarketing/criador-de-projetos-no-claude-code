@@ -44,6 +44,14 @@ Este projeto usa 3 níveis de memória. **Leia sempre nesta ordem — do menor p
 - `.memoria-do-dia.md` → Adicione uma linha: hora + o que foi feito.
 - `.memoria-projeto.md` → Atualize **apenas em mudanças estruturais**: nova feature implementada, decisão de arquitetura importante, bug crítico corrigido. Não registre detalhes do dia a dia aqui.
 
+### Enforcement Automatico
+
+Hooks globais em ~/.claude/settings.json detectam tarefas completadas e injetam lembretes obrigatorios antes da compactacao de contexto. Para funcionar:
+- Os 3 arquivos de memoria DEVEM existir no projeto
+- Hook PreCompact: detecta tarefas nao registradas e forca atualizacao
+- Hook Stop: audita se memorias foram atualizadas na sessao
+- Hook Estudador: detecta 2+ falhas sem solucao e recomenda ativacao do Estudador
+
 ---
 
 ## NOMENCLATURA

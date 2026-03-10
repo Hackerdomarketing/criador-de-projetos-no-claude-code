@@ -140,6 +140,14 @@ Leia sempre do menor para o maior — para não carregar contexto desnecessário
 - `.memoria-do-dia.md` → Ao terminar qualquer tarefa. Adicione uma linha com hora + o que foi feito.
 - `.memoria-projeto.md` → **Apenas em mudanças estruturais:** nova feature implementada, decisão de arquitetura importante, bug crítico corrigido. Não registre detalhes do dia a dia aqui.
 
+### Enforcement Automatico
+
+Hooks globais em ~/.claude/settings.json detectam tarefas completadas e injetam lembretes obrigatorios antes da compactacao de contexto. Para funcionar:
+- Os 3 arquivos de memoria DEVEM existir no projeto
+- Hook PreCompact: detecta tarefas nao registradas e forca atualizacao
+- Hook Stop: audita se memorias foram atualizadas na sessao
+- Hook Estudador: detecta 2+ falhas sem solucao e recomenda ativacao do Estudador
+
 ---
 
 ## TEMPLATE: .memoria-projeto.md
@@ -301,6 +309,13 @@ ENV/
 7. Criar `README.md`
 8. Criar `.gitignore` apropriado para o stack
 9. Criar `.env.example` (se usar variáveis de ambiente)
+9.5. **Instalar hooks de rastreamento** — Se o projeto vai usar Delta-11 (Score >= 5 ou usuário pediu):
+   - Criar pasta `.claude/` no projeto
+   - Copiar `.claude/settings.json` de `~/projetos/Formacao-delta-11/.claude/settings.json`
+   - Criar pasta `.delta-11/hooks/` e copiar scripts de `~/projetos/Formacao-delta-11/.delta-11/hooks/`
+   - Criar pasta `.delta-11/locks/` com `.gitkeep`
+   - Esses hooks garantem: lock de arquivos (previne conflito entre agentes), log de atividade em tempo real, e liberação automática de locks
+   - **NOTA:** Os hooks da Inteligência Progressiva (busca automática, captura, curadoria) já são GLOBAIS em `~/.claude/settings.json` — não precisam ser instalados por projeto
 10. `git init`
 11. `git add .`
 12. `git commit -m "Initial commit..."`
@@ -397,6 +412,7 @@ Antes de considerar o projeto criado, verificar:
 - [ ] **Link do repositório obtido e salvo**
 - [ ] Dependências instaladas (se aplicável)
 - [ ] Memória geral atualizada (incluindo link do repo)
+- [ ] Hooks globais de memoria ativos (verificar que ~/.claude/settings.json tem PreCompact e Stop com scripts de memoria)
 - [ ] Backup criado (se projeto existente modificado)
 
 ---
