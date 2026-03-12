@@ -4,7 +4,7 @@
 
 Leia `ARQUITETURA-MENTAL.md` nesta pasta. Ele define como você processa informação e é a base de todo o seu comportamento antes de qualquer ação.
 
-Caminho: `~/projetos/CRIADOR-DE-PROJETOS/ARQUITETURA-MENTAL.md`
+Caminho: `./ARQUITETURA-MENTAL.md`
 
 ---
 
@@ -301,8 +301,8 @@ ENV/
 ### Ordem de Execução
 
 1. Criar estrutura de pastas
-2. Copiar `ARQUITETURA-MENTAL.md` de `~/projetos/CRIADOR-DE-PROJETOS/ARQUITETURA-MENTAL.md` para a raiz do novo projeto
-3. Criar `CLAUDE.md` — copiar de `~/projetos/CRIADOR-DE-PROJETOS/templates/CLAUDE.md` e substituir `[DATA-ATUAL]` pela data real de hoje
+2. Copiar `ARQUITETURA-MENTAL.md` de `./ARQUITETURA-MENTAL.md` para a raiz do novo projeto
+3. Criar `CLAUDE.md` — copiar de `./templates/CLAUDE.md` e substituir `[DATA-ATUAL]` pela data real de hoje
 4. Criar `.memoria-ultimas-tarefas.md` — copiar de `templates/.memoria-ultimas-tarefas.md`
 5. Criar `.memoria-do-dia.md` — copiar de `templates/.memoria-do-dia.md`
 6. Criar `.memoria-projeto.md` — preencher com dados do projeto (nome, tipo, descrição, stack, etc.)
@@ -364,7 +364,7 @@ Após criar/modificar um projeto, SEMPRE atualizar:
 Após atualizar `.memoria-geral.md`, SEMPRE fazer commit e push:
 
 ```bash
-cd /Users/alfa/Documents/VSCODE
+cd ~/projetos
 git add .memoria-geral.md
 git commit -m "docs: registra projeto [nome-do-projeto]
 
@@ -411,8 +411,8 @@ Antes de considerar o projeto criado, verificar:
 - [ ] **Push inicial realizado**
 - [ ] **Link do repositório obtido e salvo**
 - [ ] Dependências instaladas (se aplicável)
-- [ ] Memória geral atualizada (incluindo link do repo)
 - [ ] Hooks globais de memoria ativos (verificar que ~/.claude/settings.json tem PreCompact e Stop com scripts de memoria)
+- [ ] Memória geral atualizada (incluindo link do repo)
 - [ ] Backup criado (se projeto existente modificado)
 
 ---
