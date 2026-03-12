@@ -1,373 +1,113 @@
 #!/bin/bash
-# ============================================
-# CRIADOR DE PROJETOS — Instalação
-# Versão: qualquer interface com Claude Code
-# ============================================
+
+# ═══════════════════════════════════════════════════════════════
+# CRIADOR DE PROJETOS — Script de Instalacao / Atualizacao
+# ═══════════════════════════════════════════════════════════════
+#
+# O que este script faz:
+# 1. Copia todos os arquivos para ~/.claude/skills/criador-de-projetos/
+# 2. O Claude Code detecta automaticamente a skill
+#
+# Como usar:
+#   chmod +x instalar.sh && ./instalar.sh
+#
+# Para atualizar:
+#   git pull && ./instalar.sh
+#
+# ═══════════════════════════════════════════════════════════════
+
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+SKILL_DIR="$HOME/.claude/skills/criador-de-projetos"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo ""
-echo "═══════════════════════════════════════════════════"
-echo "  Criador de Projetos — Instalação"
-echo "═══════════════════════════════════════════════════"
-echo ""
-echo "  Vamos verificar se o seu computador tem tudo"
-echo "  que precisa antes de instalar."
+echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
+echo -e "${BOLD}     CRIADOR DE PROJETOS — Instalacao${NC}"
+echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
 echo ""
 
-HOUVE_ERRO=0
+# ─── Detectar se e instalacao ou atualizacao ─────────────────
 
-# ─────────────────────────────────────────────────────
-# DETECÇÃO DO SISTEMA OPERACIONAL
-# ─────────────────────────────────────────────────────
-
-case "$(uname -s 2>/dev/null)" in
-    Darwin*)                OS="mac" ;;
-    MINGW*|MSYS*|CYGWIN*)   OS="windows" ;;
-    Linux*)                 OS="linux" ;;
-    *)                      OS="outros" ;;
-esac
-
-if [ "$OS" = "windows" ]; then
-    echo "  Sistema detectado: Windows (Git Bash)"
-    echo ""
-    echo "  No Windows, a instalação automática de ferramentas"
-    echo "  não está disponível. Se Node.js ou GitHub CLI não"
-    echo "  estiverem instalados, você vai receber instruções"
-    echo "  de como instalá-los manualmente."
-elif [ "$OS" = "mac" ]; then
-    echo "  Sistema detectado: macOS"
+if [ -f "$SKILL_DIR/SKILL.md" ]; then
+    MODO="atualizacao"
+    echo -e "${YELLOW}Modo:${NC} Atualizacao (skill ja existe)"
 else
-    echo "  Sistema detectado: $OS"
+    MODO="instalacao"
+    echo -e "${YELLOW}Modo:${NC} Instalacao nova"
 fi
 echo ""
 
-# Função para sed compatível com Mac e Windows/Linux
-sed_inplace() {
-    if [ "$OS" = "mac" ]; then
-        sed -i '' "$1" "$2" 2>/dev/null || true
-    else
-        sed -i "$1" "$2" 2>/dev/null || true
-    fi
-}
+# ─── PASSO 1: Copiar arquivos da skill ──────────────────────
 
-# ─────────────────────────────────────────────────────
-# VERIFICAÇÃO 1 — Homebrew (apenas no Mac)
-# O Homebrew é um instalador de programas para Mac.
-# Precisamos dele para instalar o Node.js e o GitHub CLI.
-# ─────────────────────────────────────────────────────
+echo -e "${YELLOW}[1/2]${NC} Copiando arquivos..."
 
-if [ "$OS" = "mac" ]; then
-    echo "  Verificando Homebrew (instalador de programas para Mac)..."
+mkdir -p "$SKILL_DIR"
+mkdir -p "$SKILL_DIR/templates"
 
-    if ! command -v brew &>/dev/null; then
-        echo ""
-        echo "  O Homebrew não está instalado."
-        echo "  Ele é necessário para instalar o Node.js e o GitHub CLI."
-        echo "  Instalando agora..."
-        echo ""
-        echo "  Pode aparecer uma janela pedindo a senha do seu computador."
-        echo "  Isso é normal — é para ter permissão de instalar programas."
-        echo ""
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Copiar arquivos principais
+cp "$SCRIPT_DIR/SKILL.md" "$SKILL_DIR/SKILL.md"
+cp "$SCRIPT_DIR/AGENTE.md" "$SKILL_DIR/AGENTE.md"
+cp "$SCRIPT_DIR/ARQUITETURA-MENTAL.md" "$SKILL_DIR/ARQUITETURA-MENTAL.md"
+cp "$SCRIPT_DIR/REGRA-ATIVACAO.md" "$SKILL_DIR/REGRA-ATIVACAO.md"
 
-        # No Apple Silicon (M1/M2/M3), o Homebrew fica em /opt/homebrew
-        if [ -f "/opt/homebrew/bin/brew" ]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-        fi
-
-        if ! command -v brew &>/dev/null; then
-            echo ""
-            echo "  ✗ Não foi possível instalar o Homebrew automaticamente."
-            echo "    Acesse https://brew.sh e siga as instruções de instalação manual."
-            echo "    Depois de instalar, rode este script novamente."
-            exit 1
-        fi
-
-        echo ""
-        echo "  ✓ Homebrew instalado com sucesso."
-    else
-        echo "  ✓ Homebrew já está instalado."
-    fi
-
-    echo ""
+# Copiar templates
+if [ -d "$SCRIPT_DIR/templates" ]; then
+    cp "$SCRIPT_DIR/templates/"* "$SKILL_DIR/templates/" 2>/dev/null || true
 fi
 
-# ─────────────────────────────────────────────────────
-# VERIFICAÇÃO 2 — Node.js
-# O Claude Code precisa do Node.js para funcionar.
-# ─────────────────────────────────────────────────────
+echo -e "  ${GREEN}✓${NC} Arquivos copiados para $SKILL_DIR"
+echo ""
 
-echo "  Verificando Node.js (necessário para o Claude Code funcionar)..."
+# ─── PASSO 2: Verificar instalacao ──────────────────────────
 
-if ! command -v node &>/dev/null; then
-    echo ""
-    if [ "$OS" = "mac" ]; then
-        echo "  O Node.js não está instalado. Instalando agora..."
-        brew install node
+echo -e "${YELLOW}[2/2]${NC} Verificando..."
 
-        if ! command -v node &>/dev/null; then
-            echo ""
-            echo "  ✗ Não foi possível instalar o Node.js automaticamente."
-            echo "    Baixe em: https://nodejs.org (clique no botão LTS)"
-            echo "    Instale normalmente e rode este script novamente."
-            HOUVE_ERRO=1
-        else
-            echo "  ✓ Node.js instalado: $(node --version)"
-        fi
+ERROS=0
+
+for ARQUIVO in SKILL.md AGENTE.md ARQUITETURA-MENTAL.md REGRA-ATIVACAO.md; do
+    if [ -f "$SKILL_DIR/$ARQUIVO" ]; then
+        echo -e "  ${GREEN}✓${NC} $ARQUIVO"
     else
-        echo "  ✗ Node.js não encontrado."
-        echo "    Acesse https://nodejs.org e clique no botão LTS para baixar."
-        echo "    Instale normalmente (Next → Next → Install)."
-        echo "    Depois feche e abra o Git Bash novamente e rode este script de novo."
-        HOUVE_ERRO=1
+        echo -e "  ${RED}✗${NC} $ARQUIVO nao encontrado"
+        ERROS=$((ERROS + 1))
     fi
+done
+
+if [ -f "$SKILL_DIR/templates/CLAUDE.md" ]; then
+    echo -e "  ${GREEN}✓${NC} templates/CLAUDE.md"
 else
-    echo "  ✓ Node.js já está instalado: $(node --version)"
+    echo -e "  ${YELLOW}⚠${NC} templates/CLAUDE.md (opcional)"
 fi
 
 echo ""
 
-# ─────────────────────────────────────────────────────
-# VERIFICAÇÃO 3 — GitHub CLI
-# Ferramenta que cria repositórios no GitHub automaticamente.
-# ─────────────────────────────────────────────────────
-
-echo "  Verificando GitHub CLI (cria repositórios no GitHub automaticamente)..."
-
-if ! command -v gh &>/dev/null; then
-    echo ""
-    if [ "$OS" = "mac" ]; then
-        echo "  O GitHub CLI não está instalado. Instalando agora..."
-        brew install gh
-
-        if ! command -v gh &>/dev/null; then
-            echo ""
-            echo "  ✗ Não foi possível instalar o GitHub CLI automaticamente."
-            echo "    Tente manualmente: brew install gh"
-            HOUVE_ERRO=1
-        else
-            echo "  ✓ GitHub CLI instalado: $(gh --version | head -1)"
-        fi
+if [ $ERROS -eq 0 ]; then
+    echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
+    if [ "$MODO" = "atualizacao" ]; then
+        echo -e "${GREEN}${BOLD}  ✓ ATUALIZACAO COMPLETA${NC}"
     else
-        echo "  ✗ GitHub CLI não encontrado."
-        echo ""
-        echo "  Para instalar no Windows, abra o PowerShell como administrador"
-        echo "  (clique com botão direito → Executar como administrador) e cole:"
-        echo "    winget install --id GitHub.cli"
-        echo ""
-        echo "  Ou baixe diretamente em: https://cli.github.com"
-        echo ""
-        echo "  Após instalar, feche e abra o Git Bash novamente e rode este script de novo."
-        HOUVE_ERRO=1
+        echo -e "${GREEN}${BOLD}  ✓ INSTALACAO COMPLETA${NC}"
     fi
-else
-    echo "  ✓ GitHub CLI já está instalado: $(gh --version | head -1)"
-fi
-
-echo ""
-
-# ─────────────────────────────────────────────────────
-# VERIFICAÇÃO 4 — Autenticação no GitHub
-# Garante que o GitHub CLI está conectado à sua conta.
-# ─────────────────────────────────────────────────────
-
-if command -v gh &>/dev/null; then
-    echo "  Verificando se o GitHub CLI está conectado à sua conta..."
-
-    if ! gh auth status &>/dev/null; then
-        echo ""
-        echo "  O GitHub CLI não está conectado ao GitHub."
-        echo "  Vamos conectar agora. Siga as instruções abaixo:"
-        echo ""
-        echo "  ➜ Use as setas do teclado para navegar pelo menu"
-        echo "  ➜ Escolha: GitHub.com"
-        echo "  ➜ Escolha: HTTPS"
-        echo "  ➜ Escolha: Login with a web browser"
-        echo "  ➜ Um código vai aparecer — copie-o"
-        echo "  ➜ O navegador vai abrir — cole o código lá"
-        echo "  ➜ Faça login na sua conta do GitHub"
-        echo ""
-        echo "  Pressione Enter quando estiver pronto para começar..."
-        read -r
-
-        gh auth login
-
-        if ! gh auth status &>/dev/null; then
-            echo ""
-            echo "  ✗ Não foi possível conectar ao GitHub."
-            echo "    Tente novamente com: gh auth login"
-            HOUVE_ERRO=1
-        else
-            echo ""
-            echo "  ✓ Conectado ao GitHub com sucesso!"
-        fi
-    else
-        USUARIO_GH=$(gh api user --jq '.login' 2>/dev/null || echo "desconhecido")
-        echo "  ✓ GitHub CLI conectado como: @$USUARIO_GH"
-    fi
-fi
-
-echo ""
-
-# ─────────────────────────────────────────────────────
-# Se houve algum erro nas verificações, parar aqui
-# ─────────────────────────────────────────────────────
-
-if [ "$HOUVE_ERRO" = "1" ]; then
-    echo "  ════════════════════════════════════════════════"
-    echo "  ⚠️  Alguns itens não puderam ser instalados."
-    echo "     Resolva os problemas acima e rode o"
-    echo "     instalador novamente."
-    echo "  ════════════════════════════════════════════════"
+    echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
     echo ""
-    exit 1
-fi
-
-# ─────────────────────────────────────────────────────
-# ESCOLHA DA PASTA
-# ─────────────────────────────────────────────────────
-
-echo "  ════════════════════════════════════════════════"
-echo "  Tudo verificado! Instalando o sistema..."
-echo "  ════════════════════════════════════════════════"
-echo ""
-echo "  Onde você quer guardar seus projetos?"
-echo "  (Pressione Enter para usar o padrão: ~/projetos)"
-echo ""
-read -p "  Pasta base [~/projetos]: " PASTA_ESCOLHIDA
-echo ""
-
-if [ -z "$PASTA_ESCOLHIDA" ]; then
-    PASTA_BASE="$HOME/projetos"
+    echo -e "  ${BOLD}Como usar:${NC}"
+    echo -e "  Abra o Claude Code e diga:"
+    echo -e "  ${CYAN}\"Cria um projeto\"${NC}"
+    echo -e "  ${CYAN}\"Novo projeto\"${NC}"
+    echo -e "  ${CYAN}\"Quero criar um app\"${NC}"
+    echo ""
+    echo -e "  ${BOLD}Para atualizar no futuro:${NC}"
+    echo -e "  ${CYAN}git pull && ./instalar.sh${NC}"
+    echo ""
 else
-    PASTA_BASE="${PASTA_ESCOLHIDA/#\~/$HOME}"
-fi
-
-echo "  ✓ Pasta escolhida: $PASTA_BASE"
-echo ""
-
-# ─────────────────────────────────────────────────────
-# INSTALAÇÃO — Copiar arquivos do sistema
-# ─────────────────────────────────────────────────────
-
-if [ ! -d "$PASTA_BASE" ]; then
-    echo "  Criando pasta $PASTA_BASE..."
-    mkdir -p "$PASTA_BASE"
-fi
-
-if [ -d "$PASTA_BASE/CRIADOR-DE-PROJETOS" ]; then
-    echo "  ⚠️  Já existe uma instalação — ela será atualizada."
+    echo -e "${RED}  ✗ Instalacao com erros. Verifique os itens acima.${NC}"
     echo ""
 fi
-
-mkdir -p "$PASTA_BASE/CRIADOR-DE-PROJETOS/templates"
-cp ARQUITETURA-MENTAL.md "$PASTA_BASE/CRIADOR-DE-PROJETOS/"
-cp AGENTE.md             "$PASTA_BASE/CRIADOR-DE-PROJETOS/"
-cp REGRA-ATIVACAO.md     "$PASTA_BASE/CRIADOR-DE-PROJETOS/"
-cp README.md             "$PASTA_BASE/CRIADOR-DE-PROJETOS/"
-cp templates/CLAUDE.md                    "$PASTA_BASE/CRIADOR-DE-PROJETOS/templates/"
-cp templates/.memoria-ultimas-tarefas.md  "$PASTA_BASE/CRIADOR-DE-PROJETOS/templates/"
-cp templates/.memoria-do-dia.md           "$PASTA_BASE/CRIADOR-DE-PROJETOS/templates/"
-
-sed_inplace "s|~/projetos/|$PASTA_BASE/|g" "$PASTA_BASE/CRIADOR-DE-PROJETOS/AGENTE.md"
-sed_inplace "s|~/projetos/|$PASTA_BASE/|g" "$PASTA_BASE/CRIADOR-DE-PROJETOS/REGRA-ATIVACAO.md"
-
-echo "  ✓ Sistema instalado em $PASTA_BASE/CRIADOR-DE-PROJETOS/"
-echo ""
-
-if [ ! -f "$PASTA_BASE/CLAUDE.md" ]; then
-    cp templates/CLAUDE.md "$PASTA_BASE/CLAUDE.md"
-    DATE=$(date +%Y-%m-%d)
-    sed_inplace "s/\[DATA-ATUAL\]/$DATE/g" "$PASTA_BASE/CLAUDE.md"
-    echo "  ✓ CLAUDE.md criado em $PASTA_BASE/CLAUDE.md"
-else
-    echo "  ✓ CLAUDE.md já existe — não foi alterado."
-    echo "    Para adicionar as regras deste sistema ao seu CLAUDE.md,"
-    echo "    copie o conteúdo de: $PASTA_BASE/CRIADOR-DE-PROJETOS/templates/CLAUDE.md"
-fi
-
-echo ""
-
-# ─────────────────────────────────────────────────────
-# GIT E GITHUB — Versionar o CRIADOR-DE-PROJETOS
-# Cria um repositório privado no GitHub do usuário
-# com o próprio sistema instalado — como backup.
-# ─────────────────────────────────────────────────────
-
-PASTA_CRIADOR="$PASTA_BASE/CRIADOR-DE-PROJETOS"
-
-echo "  Criando repositório do sistema no seu GitHub..."
-echo ""
-
-cd "$PASTA_CRIADOR" || exit 1
-
-# Criar .gitignore para o CRIADOR-DE-PROJETOS
-cat > .gitignore << 'GITIGNORE'
-.DS_Store
-*.log
-/.memoria-*.md
-!templates/.memoria-*.md
-GITIGNORE
-
-# Inicializar git se ainda não for um repositório
-if [ ! -d ".git" ]; then
-    git init -b main 2>/dev/null || git init && git checkout -b main 2>/dev/null || true
-fi
-
-# Verificar se o remote já existe (atualização)
-if git remote get-url origin &>/dev/null; then
-    echo "  ↻ Repositório já existe — enviando atualização..."
-    git add -A
-    git commit -m "chore: atualização do sistema criador de projetos" 2>/dev/null || true
-    git push origin main
-    LINK_REPO=$(gh repo view --json url -q '.url' 2>/dev/null || echo "")
-    echo "  ✓ Repositório atualizado: $LINK_REPO"
-else
-    # Verificar se o repositório já existe no GitHub
-    USUARIO_GH=$(gh api user --jq '.login' 2>/dev/null || echo "")
-    REPO_JA_EXISTE=$(gh repo view "$USUARIO_GH/criador-de-projetos" --json name -q '.name' 2>/dev/null || echo "")
-
-    git add -A
-    git commit -m "feat: instalação do sistema criador de projetos"
-
-    if [ -n "$REPO_JA_EXISTE" ]; then
-        # Repositório existe mas sem remote configurado
-        git remote add origin "https://github.com/$USUARIO_GH/criador-de-projetos.git"
-        git push -u origin main
-        LINK_REPO="https://github.com/$USUARIO_GH/criador-de-projetos"
-    else
-        # Criar novo repositório privado
-        gh repo create criador-de-projetos \
-            --private \
-            --source=. \
-            --push \
-            --description "Meu sistema de criação de projetos com Claude Code" \
-            2>/dev/null || true
-        LINK_REPO=$(gh repo view "$USUARIO_GH/criador-de-projetos" --json url -q '.url' 2>/dev/null || echo "")
-    fi
-
-    if [ -n "$LINK_REPO" ]; then
-        echo "  ✓ Repositório criado (privado): $LINK_REPO"
-    else
-        echo "  ⚠️  Não foi possível criar o repositório no GitHub."
-        echo "    Os arquivos estão instalados localmente normalmente."
-    fi
-fi
-
-echo ""
-echo "═══════════════════════════════════════════════════"
-echo "  Instalação concluída!"
-echo ""
-echo "  O que foi instalado:"
-echo "  ✓ Node.js (necessário para o Claude Code)"
-echo "  ✓ GitHub CLI (cria repositórios automaticamente)"
-echo "  ✓ Sistema Criador de Projetos em $PASTA_BASE/"
-if [ -n "$LINK_REPO" ]; then
-echo "  ✓ Backup do sistema no GitHub: $LINK_REPO"
-fi
-echo ""
-echo "  Próximo passo:"
-echo "  Abra o terminal em $PASTA_BASE/"
-echo "  Digite 'claude' e diga:"
-echo "  'criar um projeto' ou 'quero criar'"
-echo "═══════════════════════════════════════════════════"
-echo ""
