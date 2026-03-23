@@ -66,9 +66,43 @@ fi
 echo -e "  ${GREEN}✓${NC} Arquivos copiados para $SKILL_DIR"
 echo ""
 
-# ─── PASSO 2: Verificar instalacao ──────────────────────────
+# ─── PASSO 2: Configurar triggers no CLAUDE.md global ────────
 
-echo -e "${YELLOW}[2/2]${NC} Verificando..."
+echo -e "${YELLOW}[2/3]${NC} Configurando triggers no CLAUDE.md global..."
+
+CLAUDE_MD="$HOME/.claude/CLAUDE.md"
+
+if [ ! -f "$CLAUDE_MD" ]; then
+    touch "$CLAUDE_MD"
+fi
+
+if ! grep -q "## CRIADOR DE PROJETOS" "$CLAUDE_MD" 2>/dev/null; then
+    cat >> "$CLAUDE_MD" << 'TRIGGER_BLOCK'
+
+
+## CRIADOR DE PROJETOS
+
+Quando o usuario usar qualquer uma destas frases, ative a skill `criador-de-projetos`:
+
+**Triggers de criacao:**
+- "cria um projeto", "novo projeto", "criar um sistema", "desenvolve um"
+- "quero criar", "faz um app", "preciso de um", "monta um"
+
+**Triggers de estrutura:**
+- "onde coloco", "qual pasta", "como organizo", "estrutura de pastas"
+
+**Acao:** Usar a skill `criador-de-projetos` que carrega o protocolo completo.
+TRIGGER_BLOCK
+    echo -e "  ${GREEN}✓${NC} Triggers configurados no CLAUDE.md"
+else
+    echo -e "  ${GREEN}✓${NC} Triggers ja estavam configurados"
+fi
+
+echo ""
+
+# ─── PASSO 3: Verificar instalacao ──────────────────────────
+
+echo -e "${YELLOW}[3/3]${NC} Verificando..."
 
 ERROS=0
 
