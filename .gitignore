@@ -2,6 +2,9 @@
 *.log
 .env
 .env.*
+credentials.json
+*.pem
+*.key
 node_modules/
 __pycache__/
 *.py[cod]

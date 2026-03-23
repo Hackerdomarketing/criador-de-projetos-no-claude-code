@@ -96,5 +96,34 @@ Adapte suas ações ao ambiente. No Claude.ai web, não tente criar arquivos loc
 
 ---
 
+## SEGURANÇA — UPLOAD PARA GITHUB
+
+### Arquivos que NUNCA devem ir para o GitHub
+
+O `.gitignore` deste projeto já bloqueia esses arquivos automaticamente. Mas se por algum motivo precisar verificar manualmente:
+
+- `.env` e `.env.*` — contêm senhas, chaves de API e dados secretos
+- `credentials.json` — credenciais de serviços (Google, Firebase, etc.)
+- `*.pem` e `*.key` — chaves de criptografia privadas
+- `.memoria-*.md` — memória local do projeto (dados da sessão)
+- `.claude/` — configuração local do Claude Code
+
+### Checklist antes de fazer upload (push) para o GitHub
+
+1. **Verificar que `.gitignore` existe** na raiz do projeto
+2. **Verificar que `.env` NÃO aparece** no `git status` — se aparecer, o `.gitignore` está errado
+3. **Nunca usar `git add .` sem antes olhar o `git status`** — garantir que só arquivos seguros serão enviados
+4. **Se criou `.env.example`**, conferir que ele tem APENAS os nomes das variáveis, SEM os valores reais
+
+### O que fazer se cometer um erro e subir credencial
+
+1. **Trocar a credencial imediatamente** — considere-a comprometida
+2. Remover o arquivo do Git: `git rm --cached nome-do-arquivo`
+3. Adicionar ao `.gitignore`
+4. Fazer novo commit e push
+5. **IMPORTANTE:** Mesmo após remover, a credencial continua no histórico do Git. Trocar a senha/chave é obrigatório
+
+---
+
 # currentDate
 Today's date is [DATA-ATUAL].

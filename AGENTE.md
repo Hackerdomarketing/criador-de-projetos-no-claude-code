@@ -267,35 +267,80 @@ Criar `.gitignore` apropriado para o tipo de projeto:
 
 **Node.js:**
 ```
-node_modules/
+# Credenciais e segredos — NUNCA subir
 .env
-*.log
-.DS_Store
+.env.*
+credentials.json
+*.pem
+*.key
+
+# Dependências
+node_modules/
+
+# Build e cache
 dist/
 build/
 coverage/
+
+# Sistema e logs
+.DS_Store
+*.log
+
+# Memória local do projeto (não versionar)
+.memoria-*.md
+
+# Configuração local do Claude
+.claude/
 ```
 
 **Python:**
 ```
+# Credenciais e segredos — NUNCA subir
+.env
+.env.*
+credentials.json
+*.pem
+*.key
+
+# Dependências e ambientes virtuais
 __pycache__/
 *.py[cod]
 *$py.class
-.env
 venv/
 .venv/
 env/
 ENV/
-*.log
-.DS_Store
+
+# Cache e logs
 .pytest_cache/
+.DS_Store
+*.log
+
+# Memória local do projeto (não versionar)
+.memoria-*.md
+
+# Configuração local do Claude
+.claude/
 ```
 
 **Geral (fallback):**
 ```
+# Credenciais e segredos — NUNCA subir
 .env
-*.log
+.env.*
+credentials.json
+*.pem
+*.key
+
+# Sistema e logs
 .DS_Store
+*.log
+
+# Memória local do projeto (não versionar)
+.memoria-*.md
+
+# Configuração local do Claude
+.claude/
 ```
 
 ### Ordem de Execução
@@ -318,6 +363,10 @@ ENV/
    - **NOTA:** Os hooks da Inteligência Progressiva (busca automática, captura, curadoria) já são GLOBAIS em `~/.claude/settings.json` — não precisam ser instalados por projeto
 10. `git init`
 11. `git add .`
+11.5. **Verificação de segurança pré-commit** — Antes de fazer commit:
+   - Rodar `git status` e confirmar que NÃO aparecem: `.env`, `credentials.json`, `*.pem`, `*.key`
+   - Se algum arquivo sensível aparecer, verificar que o `.gitignore` está correto
+   - **NUNCA prosseguir com o commit se houver arquivo sensível na lista**
 12. `git commit -m "Initial commit..."`
 13. `gh repo create --private --source=. --push`
 14. Obter URL do repositório
