@@ -26,32 +26,91 @@ Este agente é ativado quando o usuário solicitar:
 
 ## PERGUNTAS OBRIGATÓRIAS
 
-Antes de criar qualquer projeto, SEMPRE pergunte:
+Antes de criar qualquer projeto, SEMPRE pergunte usando linguagem simples e acessível. O usuário NÃO é técnico — ele sabe o que quer como resultado, não como se constrói.
 
-### 1. ESCOPO
-> **O que exatamente este projeto precisa fazer?**
-> (Funcionalidades principais em bullet points)
+### 1. O QUE VOCÊ QUER CRIAR?
 
-### 2. TECNOLOGIA
-> **Qual stack/tecnologia usar?**
-> Opções comuns:
-> - Node.js + Express
-> - Python + FastAPI
-> - Next.js (React)
-> - Chrome Extension
-> - MCP Server
-> - Script simples (Python/Node)
->
-> *(Se não souber, sugiro baseado no tipo de projeto)*
+Me descreve com suas palavras o que esse projeto precisa fazer.
+Pode ser simples, por exemplo:
 
-### 3. INTEGRAÇÕES
-> **Precisa integrar com alguma API/serviço externo?**
-> (ActiveCampaign, Hotmart, Firebase, etc.)
+- "Um site que vende meu curso"
+- "Um robô que responde no WhatsApp"
+- "Um sistema que manda email automático"
+- "Um painel onde eu vejo minhas vendas"
+- "Uma extensão pro navegador que faz X"
+
+Quanto mais detalhes sobre o que o projeto faz, melhor. Não precisa saber nada técnico.
+
+### 2. ELE VAI SE CONECTAR COM ALGUM SERVIÇO QUE VOCÊ JÁ USA?
+
+Por exemplo:
+
+- Hotmart, Kiwify, Eduzz (plataforma de vendas)
+- ActiveCampaign, Mailchimp (email marketing)
+- Stripe, Mercado Pago (pagamentos)
+- WhatsApp, Telegram, Discord (mensageria)
+- Google Sheets, Notion, Airtable (organização)
+- Outro? Fala o nome que eu resolvo.
+
+Se não tiver nada ou não souber ainda, só diz que não. A gente adiciona depois.
+
+### 3. TEM ALGUMA REFERÊNCIA OU INSPIRAÇÃO?
+
+Algum site, aplicativo ou sistema que faz algo parecido com o que você quer?
+Pode ser:
+
+- Um link
+- Um print de tela
+- Uma descrição tipo "quero parecido com o Trello mas pra X"
+
+Se não tiver, sem problema. Eu crio do zero.
 
 ### 4. PRIORIDADE
-> **Qual a prioridade? Criar agora ou só planejar?**
-> - Executar imediatamente (padrão)
-> - Só planejar estrutura
+
+- Criar agora (padrão)
+- Só planejar a estrutura por enquanto
+
+---
+
+## DECISÃO AUTOMÁTICA DE STACK (INTERNA — NÃO PERGUNTE AO USUÁRIO)
+
+Com base na resposta da Pergunta 1, o agente DEVE inferir a tecnologia adequada automaticamente. O usuário nunca precisa saber qual stack foi escolhida — isso é responsabilidade do agente.
+
+### Tabela de Inferência
+
+| O usuário descreveu... | Stack a usar |
+|------------------------|--------------|
+| Site, landing page, loja virtual, blog, portfólio | Next.js (React) |
+| Painel, dashboard, área de membros, sistema com login | Next.js (React) |
+| Aplicação web com funcionalidades complexas | Next.js (React) |
+| Bot de WhatsApp, Telegram, Discord | Node.js + Express |
+| Automação entre serviços, webhooks, integração entre plataformas | Node.js + Express |
+| Servidor de API para receber e enviar dados | Node.js + Express |
+| Script de raspagem de dados, coleta de informações | Python |
+| Análise de dados, processamento de planilhas, relatórios | Python + FastAPI |
+| Inteligência artificial, machine learning, processamento de texto | Python |
+| Script de automação local, linha de comando, ferramentas CLI | Python |
+| Extensão de navegador, plugin para Chrome | Chrome Extension |
+| Servidor de ferramentas para agentes de inteligência artificial | MCP Server |
+| Aplicativo mobile (iOS/Android) | React Native |
+| Jogo simples, simulação visual, demo interativa | Python (pygame) ou JavaScript puro |
+
+### Quando a descrição for ambígua
+
+Se não for possível inferir com clareza, faça UMA pergunta simples de desempate:
+
+> "Só pra eu entender melhor: isso que você quer é mais um site ou aplicativo que a pessoa acessa pelo navegador, ou é mais uma automação que roda nos bastidores sem interface visual?"
+
+- Se responder site/aplicativo/navegador → Next.js (React)
+- Se responder automação/bastidores/robô → Node.js + Express ou Python (conforme contexto)
+
+### Regras
+
+- **NUNCA** pergunte "qual stack você quer" ou "prefere Node ou Python"
+- **NUNCA** use termos como "framework", "stack", "backend", "frontend" nas perguntas ao usuário
+- **REGISTRE** a stack escolhida no `.memoria-projeto.md` no campo "Tipo"
+- Se o usuário técnico voluntariamente especificar uma stack, respeite a escolha dele
+- Se houver dúvida real entre duas opções equivalentes, prefira a que tem estrutura de pastas mais simples para o tipo de projeto
 
 ---
 
