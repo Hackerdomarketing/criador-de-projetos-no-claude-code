@@ -1,14 +1,19 @@
 ---
 name: criador-de-projetos
 description: |
-  Sistema automatizado para criar projetos com estrutura profissional, memoria de 3 niveis, Git e GitHub.
+  Sistema automatizado para criar projetos com estrutura profissional, memoria de 3 niveis, rules modulares, Git e GitHub.
 
   Use quando precisar:
   1. Criar um novo projeto de software do zero
   2. Montar estrutura de pastas para um novo sistema
   3. Inicializar projeto com Git e repositorio GitHub privado
-  4. Criar projeto com memoria persistente e CLAUDE.md padronizado
+  4. Criar projeto com memoria persistente, CLAUDE.md e rules padronizados
   5. Saber onde colocar arquivos ou como organizar um projeto
+
+  O que instala:
+  - Rules globais em ~/.claude/rules/ (comunicacao, seguranca, nomenclatura, comandos destrutivos)
+  - Rules por projeto em .claude/rules/ (memoria, seguranca-github, ambiente)
+  - Templates de CLAUDE.md, memorias e ARQUITETURA-MENTAL.md
 
   Palavras-chave: cria um projeto, novo projeto, criar um sistema, desenvolve um, quero criar, faz um app, preciso de um, monta um, onde coloco, qual pasta, como organizo, estrutura de pastas, criar projeto, criador de projetos.
 ---
@@ -62,16 +67,17 @@ Seguir a ordem de execucao completa do AGENTE.md:
 1. Criar pasta em `~/Documents/VSCODE/nome-do-projeto/` (kebab-case)
 2. Copiar `ARQUITETURA-MENTAL.md` do CRIADOR-DE-PROJETOS para raiz do novo projeto
 3. Criar `CLAUDE.md` a partir do template em `templates/CLAUDE.md`
-4. Criar `.memoria-ultimas-tarefas.md` a partir do template
-5. Criar `.memoria-do-dia.md` a partir do template
-6. Criar `.memoria-projeto.md` preenchido com dados do projeto
-7. Criar `README.md`
-8. Criar `.gitignore` apropriado para o stack
-9. Criar `.env.example` (se aplicavel)
-10. `git init` + primeiro commit
-11. `gh repo create --private --source=. --push`
-12. Atualizar `.memoria-projeto.md` com link do repo
-13. Atualizar `.memoria-geral.md` na raiz do workspace
+4. Criar `.claude/rules/` com rules do projeto (copiar de `templates/rules-projeto/`)
+5. Criar `.memoria-ultimas-tarefas.md` a partir do template
+6. Criar `.memoria-do-dia.md` a partir do template
+7. Criar `.memoria-projeto.md` preenchido com dados do projeto
+8. Criar `README.md`
+9. Criar `.gitignore` apropriado para o stack
+10. Criar `.env.example` (se aplicavel)
+11. `git init` + primeiro commit
+12. `gh repo create --private --source=. --push`
+13. Atualizar `.memoria-projeto.md` com link do repo
+14. Atualizar `.memoria-geral.md` na raiz do workspace
 
 ### Passo 4: Verificacao
 

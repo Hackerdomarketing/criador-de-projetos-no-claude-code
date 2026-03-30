@@ -32,17 +32,13 @@ Recomeçar mais alto.
 
 ## SISTEMA DE MEMÓRIA DO PROJETO
 
-Este projeto usa 3 níveis de memória. **Leia sempre nesta ordem — do menor para o maior:**
+Este projeto usa 3 níveis de memória. Regras detalhadas em `.claude/rules/memoria.md`.
 
-1. `.memoria-ultimas-tarefas.md` — Leia **primeiro**. As 3 tarefas mais recentes. Rápido e direto ao ponto.
-2. `.memoria-do-dia.md` — Leia **segundo**. Log cronológico do dia atual.
-3. `.memoria-projeto.md` — Leia **por último**, e somente se precisar de contexto mais amplo.
+Ordem de leitura ao iniciar sessão (do menor para o maior):
 
-**Ao terminar qualquer tarefa, atualize os 3 níveis:**
-
-- `.memoria-ultimas-tarefas.md` → Adicione a tarefa recém-concluída. Mantenha **apenas as 3 mais recentes** — remova a mais antiga ao adicionar nova.
-- `.memoria-do-dia.md` → Adicione uma linha: hora + o que foi feito.
-- `.memoria-projeto.md` → Atualize **apenas em mudanças estruturais**: nova feature implementada, decisão de arquitetura importante, bug crítico corrigido. Não registre detalhes do dia a dia aqui.
+1. `.memoria-ultimas-tarefas.md` — Leia **primeiro**
+2. `.memoria-do-dia.md` — Leia **segundo**
+3. `.memoria-projeto.md` — Leia **por último**, somente se precisar de contexto mais amplo
 
 ### Enforcement Automatico
 
@@ -50,78 +46,6 @@ Hooks globais em ~/.claude/settings.json detectam tarefas completadas e injetam 
 - Os 3 arquivos de memoria DEVEM existir no projeto
 - Hook PreCompact: detecta tarefas nao registradas e forca atualizacao
 - Hook Stop: audita se memorias foram atualizadas na sessao
-- Hook Estudador: detecta 2+ falhas sem solucao e recomenda ativacao do Estudador
-
----
-
-## NOMENCLATURA
-
-Use sempre nomes óbvios e descritivos que qualquer pessoa entenda sem explicação.
-
-❌ ERRADO: `btn-cta`, `handleEvt`, `processData`, `util.js`, `x`, `data2`, `fix`, `wip`, `temp`
-✅ CERTO: `botao-comprar-agora`, `ao-clicar-em-enviar`, `calcular-total-do-carrinho`, `formatar-data.js`, `preco-com-desconto`, `corrigir-calculo-de-frete`
-
-**Regra:** Se você precisar de um comentário para explicar o que o nome significa, o nome está errado. Mude o nome.
-
----
-
-## COMUNICAÇÃO
-
-Toda vez que mencionar qualquer termo técnico, conceito de programação, nome de tecnologia, ou decisão que envolva escolha de ferramentas, inclua uma explicação simples em linguagem acessível.
-
-**Formato:** escreva o termo técnico + inclua a explicação entre colchetes: o **quê** é + **por quê** estou usando + **analogia** (quando ajudar).
-
-**Exemplos:**
-
-❌ ERRADO: "Vamos usar Next.js com SSR e Tailwind CSS?"
-
-✅ CERTO: "Vamos usar Next.js [o sistema que monta as páginas do site — como a fundação de uma casa] com renderização no servidor [as páginas são preparadas antes de chegar no seu navegador, como um restaurante que prepara o prato antes de você sentar — mais rápido e o Google lê melhor] e Tailwind CSS [uma forma de deixar o site bonito que acelera muito o trabalho]?"
-
-**Quando NÃO precisa explicar:** termos que o próprio usuário digitou na mensagem, ou que já usou antes na conversa.
-
----
-
-## AMBIENTE DE TRABALHO
-
-No início de cada sessão, identifique como o usuário está usando o Claude:
-
-| Ambiente | Como reconhecer | O que pode fazer |
-|----------|----------------|-----------------|
-| Claude Code no VS Code | Extensão Anthropic no editor | Criar/editar arquivos, rodar comandos |
-| Claude Code no Terminal | Comando `claude` no terminal | Criar/editar arquivos, rodar comandos |
-| Claude Desktop App | App com MCP configurado | Acessar arquivos via MCP |
-| Claude.ai no navegador | Sem acesso a arquivos locais | Só texto |
-
-Adapte suas ações ao ambiente. No Claude.ai web, não tente criar arquivos locais.
-
----
-
-## SEGURANÇA — UPLOAD PARA GITHUB
-
-### Arquivos que NUNCA devem ir para o GitHub
-
-O `.gitignore` deste projeto já bloqueia esses arquivos automaticamente. Mas se por algum motivo precisar verificar manualmente:
-
-- `.env` e `.env.*` — contêm senhas, chaves de API e dados secretos
-- `credentials.json` — credenciais de serviços (Google, Firebase, etc.)
-- `*.pem` e `*.key` — chaves de criptografia privadas
-- `.memoria-*.md` — memória local do projeto (dados da sessão)
-- `.claude/` — configuração local do Claude Code
-
-### Checklist antes de fazer upload (push) para o GitHub
-
-1. **Verificar que `.gitignore` existe** na raiz do projeto
-2. **Verificar que `.env` NÃO aparece** no `git status` — se aparecer, o `.gitignore` está errado
-3. **Nunca usar `git add .` sem antes olhar o `git status`** — garantir que só arquivos seguros serão enviados
-4. **Se criou `.env.example`**, conferir que ele tem APENAS os nomes das variáveis, SEM os valores reais
-
-### O que fazer se cometer um erro e subir credencial
-
-1. **Trocar a credencial imediatamente** — considere-a comprometida
-2. Remover o arquivo do Git: `git rm --cached nome-do-arquivo`
-3. Adicionar ao `.gitignore`
-4. Fazer novo commit e push
-5. **IMPORTANTE:** Mesmo após remover, a credencial continua no histórico do Git. Trocar a senha/chave é obrigatório
 
 ---
 

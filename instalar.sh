@@ -47,10 +47,12 @@ echo ""
 
 # ─── PASSO 1: Copiar arquivos da skill ──────────────────────
 
-echo -e "${YELLOW}[1/2]${NC} Copiando arquivos..."
+echo -e "${YELLOW}[1/4]${NC} Copiando arquivos da skill..."
 
 mkdir -p "$SKILL_DIR"
 mkdir -p "$SKILL_DIR/templates"
+mkdir -p "$SKILL_DIR/templates/rules-globais"
+mkdir -p "$SKILL_DIR/templates/rules-projeto"
 
 # Copiar arquivos principais
 cp "$SCRIPT_DIR/SKILL.md" "$SKILL_DIR/SKILL.md"
@@ -59,16 +61,52 @@ cp "$SCRIPT_DIR/ARQUITETURA-MENTAL.md" "$SKILL_DIR/ARQUITETURA-MENTAL.md"
 cp "$SCRIPT_DIR/REGRA-ATIVACAO.md" "$SKILL_DIR/REGRA-ATIVACAO.md"
 
 # Copiar templates
-if [ -d "$SCRIPT_DIR/templates" ]; then
-    cp "$SCRIPT_DIR/templates/"* "$SKILL_DIR/templates/" 2>/dev/null || true
+if [ -f "$SCRIPT_DIR/templates/CLAUDE.md" ]; then
+    cp "$SCRIPT_DIR/templates/CLAUDE.md" "$SKILL_DIR/templates/CLAUDE.md"
+fi
+
+# Copiar templates de rules globais
+if [ -d "$SCRIPT_DIR/templates/rules-globais" ]; then
+    cp "$SCRIPT_DIR/templates/rules-globais/"*.md "$SKILL_DIR/templates/rules-globais/" 2>/dev/null || true
+fi
+
+# Copiar templates de rules de projeto
+if [ -d "$SCRIPT_DIR/templates/rules-projeto" ]; then
+    cp "$SCRIPT_DIR/templates/rules-projeto/"*.md "$SKILL_DIR/templates/rules-projeto/" 2>/dev/null || true
 fi
 
 echo -e "  ${GREEN}✓${NC} Arquivos copiados para $SKILL_DIR"
 echo ""
 
-# ─── PASSO 2: Configurar triggers no CLAUDE.md global ────────
+# ─── PASSO 2: Instalar rules globais ──────────────────────────
 
-echo -e "${YELLOW}[2/3]${NC} Configurando triggers no CLAUDE.md global..."
+echo -e "${YELLOW}[2/4]${NC} Instalando rules globais em ~/.claude/rules/..."
+
+RULES_DIR="$HOME/.claude/rules"
+mkdir -p "$RULES_DIR"
+
+RULES_INSTALADOS=0
+for RULE_FILE in "$SCRIPT_DIR/templates/rules-globais/"*.md; do
+    if [ -f "$RULE_FILE" ]; then
+        RULE_NAME=$(basename "$RULE_FILE")
+        if [ ! -f "$RULES_DIR/$RULE_NAME" ]; then
+            cp "$RULE_FILE" "$RULES_DIR/$RULE_NAME"
+            echo -e "  ${GREEN}✓${NC} $RULE_NAME instalado"
+            RULES_INSTALADOS=$((RULES_INSTALADOS + 1))
+        else
+            echo -e "  ${YELLOW}→${NC} $RULE_NAME ja existe (mantido)"
+        fi
+    fi
+done
+
+if [ $RULES_INSTALADOS -eq 0 ]; then
+    echo -e "  ${GREEN}✓${NC} Rules globais ja estavam instalados"
+fi
+echo ""
+
+# ─── PASSO 3: Configurar triggers no CLAUDE.md global ────────
+
+echo -e "${YELLOW}[3/4]${NC} Configurando triggers no CLAUDE.md global..."
 
 CLAUDE_MD="$HOME/.claude/CLAUDE.md"
 
@@ -100,12 +138,13 @@ fi
 
 echo ""
 
-# ─── PASSO 3: Verificar instalacao ──────────────────────────
+# ─── PASSO 4: Verificar instalacao ──────────────────────────
 
-echo -e "${YELLOW}[3/3]${NC} Verificando..."
+echo -e "${YELLOW}[4/4]${NC} Verificando..."
 
 ERROS=0
 
+echo -e "  ${BOLD}Skill:${NC}"
 for ARQUIVO in SKILL.md AGENTE.md ARQUITETURA-MENTAL.md REGRA-ATIVACAO.md; do
     if [ -f "$SKILL_DIR/$ARQUIVO" ]; then
         echo -e "  ${GREEN}✓${NC} $ARQUIVO"
@@ -120,6 +159,26 @@ if [ -f "$SKILL_DIR/templates/CLAUDE.md" ]; then
 else
     echo -e "  ${YELLOW}⚠${NC} templates/CLAUDE.md (opcional)"
 fi
+
+echo ""
+echo -e "  ${BOLD}Rules globais (~/.claude/rules/):${NC}"
+for RULE in comunicacao.md seguranca.md nomenclatura.md comandos-destrutivos.md; do
+    if [ -f "$RULES_DIR/$RULE" ]; then
+        echo -e "  ${GREEN}✓${NC} $RULE"
+    else
+        echo -e "  ${YELLOW}⚠${NC} $RULE nao encontrado"
+    fi
+done
+
+echo ""
+echo -e "  ${BOLD}Templates de rules (para novos projetos):${NC}"
+for RULE in memoria.md seguranca-github.md ambiente.md; do
+    if [ -f "$SKILL_DIR/templates/rules-projeto/$RULE" ]; then
+        echo -e "  ${GREEN}✓${NC} rules-projeto/$RULE"
+    else
+        echo -e "  ${YELLOW}⚠${NC} rules-projeto/$RULE nao encontrado"
+    fi
+done
 
 echo ""
 

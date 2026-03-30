@@ -123,6 +123,11 @@ Todo novo projeto DEVE seguir esta estrutura:
 └── nome-do-projeto/                         ← Nome em kebab-case (minúsculo, hífens)
     ├── ARQUITETURA-MENTAL.md                ← OBRIGATÓRIO — copiado do CRIADOR-DE-PROJETOS
     ├── CLAUDE.md                            ← OBRIGATÓRIO — gerado a partir do template
+    ├── .claude/                             ← Configuração local do Claude Code
+    │   └── rules/                           ← Regras modulares do projeto
+    │       ├── memoria.md                   ← Como usar o sistema de memória
+    │       ├── seguranca-github.md          ← Checklist de segurança para push
+    │       └── ambiente.md                  ← Detecção de ambiente de trabalho
     ├── .memoria-ultimas-tarefas.md          ← Memória de curto prazo (3 últimas tarefas)
     ├── .memoria-do-dia.md                   ← Log cronológico do dia
     ├── .memoria-projeto.md                  ← Memória completa do projeto
@@ -407,31 +412,32 @@ credentials.json
 1. Criar estrutura de pastas
 2. Copiar `ARQUITETURA-MENTAL.md` de `./ARQUITETURA-MENTAL.md` para a raiz do novo projeto
 3. Criar `CLAUDE.md` — copiar de `./templates/CLAUDE.md` e substituir `[DATA-ATUAL]` pela data real de hoje
-4. Criar `.memoria-ultimas-tarefas.md` — copiar de `templates/.memoria-ultimas-tarefas.md`
-5. Criar `.memoria-do-dia.md` — copiar de `templates/.memoria-do-dia.md`
-6. Criar `.memoria-projeto.md` — preencher com dados do projeto (nome, tipo, descrição, stack, etc.)
-7. Criar `README.md`
-8. Criar `.gitignore` apropriado para o stack
-9. Criar `.env.example` (se usar variáveis de ambiente)
-9.5. **Instalar hooks de rastreamento** — Se o projeto vai usar Delta-11 (Score >= 5 ou usuário pediu):
+4. **Criar `.claude/rules/` com rules do projeto** — copiar todos os arquivos de `./templates/rules-projeto/` para `.claude/rules/` do novo projeto
+5. Criar `.memoria-ultimas-tarefas.md` — copiar de `templates/.memoria-ultimas-tarefas.md`
+6. Criar `.memoria-do-dia.md` — copiar de `templates/.memoria-do-dia.md`
+7. Criar `.memoria-projeto.md` — preencher com dados do projeto (nome, tipo, descrição, stack, etc.)
+8. Criar `README.md`
+9. Criar `.gitignore` apropriado para o stack
+10. Criar `.env.example` (se usar variáveis de ambiente)
+10.5. **Instalar hooks de rastreamento** — Se o projeto vai usar Delta-11 (Score >= 5 ou usuário pediu):
    - Criar pasta `.claude/` no projeto
    - Copiar `.claude/settings.json` de `~/projetos/Formacao-delta-11/.claude/settings.json`
    - Criar pasta `.delta-11/hooks/` e copiar scripts de `~/projetos/Formacao-delta-11/.delta-11/hooks/`
    - Criar pasta `.delta-11/locks/` com `.gitkeep`
    - Esses hooks garantem: lock de arquivos (previne conflito entre agentes), log de atividade em tempo real, e liberação automática de locks
    - **NOTA:** Os hooks da Inteligência Progressiva (busca automática, captura, curadoria) já são GLOBAIS em `~/.claude/settings.json` — não precisam ser instalados por projeto
-10. `git init`
-11. `git add .`
-11.5. **Verificação de segurança pré-commit** — Antes de fazer commit:
+11. `git init`
+12. `git add .`
+12.5. **Verificação de segurança pré-commit** — Antes de fazer commit:
    - Rodar `git status` e confirmar que NÃO aparecem: `.env`, `credentials.json`, `*.pem`, `*.key`
    - Se algum arquivo sensível aparecer, verificar que o `.gitignore` está correto
    - **NUNCA prosseguir com o commit se houver arquivo sensível na lista**
-12. `git commit -m "Initial commit..."`
-13. `gh repo create --private --source=. --push`
-14. Obter URL do repositório
-15. Atualizar `.memoria-projeto.md` com link do repo
-16. Atualizar `.memoria-geral.md`
-17. Reportar conclusão com link do repositório
+13. `git commit -m "Initial commit..."`
+14. `gh repo create --private --source=. --push`
+15. Obter URL do repositório
+16. Atualizar `.memoria-projeto.md` com link do repo
+17. Atualizar `.memoria-geral.md`
+18. Reportar conclusão com link do repositório
 
 ### Tratamento de Erros
 
@@ -507,6 +513,7 @@ Antes de considerar o projeto criado, verificar:
 - [ ] Nome em kebab-case (minúsculo, hífens)
 - [ ] `ARQUITETURA-MENTAL.md` copiado para a raiz do projeto
 - [ ] `CLAUDE.md` criado (copiado do template com data real de hoje substituída)
+- [ ] `.claude/rules/` criado com rules do projeto (memoria.md, seguranca-github.md, ambiente.md)
 - [ ] `.memoria-ultimas-tarefas.md` criado (copiado do template)
 - [ ] `.memoria-do-dia.md` criado (copiado do template)
 - [ ] `.memoria-projeto.md` criado e preenchido com dados do projeto
@@ -542,18 +549,19 @@ Antes de considerar o projeto criado, verificar:
 2. Cria estrutura de arquivos (src/, docs/, tests/)
 3. Copia `ARQUITETURA-MENTAL.md` para a raiz do projeto
 4. Cria `CLAUDE.md` a partir do template (com data real)
-5. Cria `.memoria-ultimas-tarefas.md` e `.memoria-do-dia.md` a partir dos templates
-6. Cria `.memoria-projeto.md` preenchido com dados do projeto
-7. Cria `README.md`
-8. Cria `.gitignore`
-9. Instala dependências
-10. **Inicializa Git (`git init`)**
-11. **Primeiro commit (`git commit -m "Initial commit"`)**
-12. **Cria repositório GitHub privado**
-13. **Push inicial para GitHub**
-14. **Obtém link do repositório**
-15. Atualiza `.memoria-geral.md` (com link do repo)
-16. Reporta conclusão com link do repositório
+5. Cria `.claude/rules/` com rules do projeto (memoria, seguranca-github, ambiente)
+6. Cria `.memoria-ultimas-tarefas.md` e `.memoria-do-dia.md` a partir dos templates
+7. Cria `.memoria-projeto.md` preenchido com dados do projeto
+8. Cria `README.md`
+9. Cria `.gitignore`
+10. Instala dependências
+11. **Inicializa Git (`git init`)**
+12. **Primeiro commit (`git commit -m "Initial commit"`)**
+13. **Cria repositório GitHub privado**
+14. **Push inicial para GitHub**
+15. **Obtém link do repositório**
+16. Atualiza `.memoria-geral.md` (com link do repo)
+17. Reporta conclusão com link do repositório
 
 ---
 
